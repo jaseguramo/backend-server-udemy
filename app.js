@@ -1,38 +1,31 @@
 // Requires (Importación de librerias de terceros o personalizadas que necesitamos)
 var express = require('express');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 
 // Inicializar variables
 var app = express();
 
-//Conexión a la base de datos
-/*mongoose.connection.openUri('mongodb://cluster0-zx91l.mongodb.net/hospitalDB', (err, resp) => {
-    if (err) throw err;
+// BodyParser
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
-    console.log('DataBase is \x1b[32m%s\x1b[0m', 'online', 'at port 3000');
-})*/
+// Importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+var loginRoutes = require('./routes/login');
 
-mongoose.connect('mongodb+srv://AngularUser:cm4CWUP8hmQWicPp@cluster0-zx91l.mongodb.net/hospitalDB?retryWrites=true&w=majority',
-        //mongoose.connect('mongodb://AngularUser:cm4CWUP8hmQWicPp@cluster0-zx91l.mongodb.net/hospitalDB', 
-        { useNewUrlParser: true, useUnifiedTopology: true }
-        /*,
-            (err, resp) => {
-                if (err) throw err;
-
-                console.log('DataBase is \x1b[32m%s\x1b[0m', 'online');
-            }*/
-    ).then(() => console.log('DataBase is \x1b[32m%s\x1b[0m', 'online'))
+// Conexión a la base de datos
+mongoose.connect('mongodb+srv://AngularUser:cm4CWUP8hmQWicPp@cluster0-zx91l.mongodb.net/hospitalDB?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('DataBase is \x1b[32m%s\x1b[0m', 'online'))
     .catch(err => {
         console.log('DataBase Connection Error: \x1b[31m%s\x1b[0m', err.message);
     });;
 
 // Rutas
-app.get('/', (request, response, next) => {
-    response.status(403).json({
-        ok: true,
-        mensaje: 'Petición realizada correctamente'
-    });
-});
+app.use('/usuario', usuarioRoutes);
+app.use('/login', loginRoutes);
+app.use('/', appRoutes);
 
 // Escuchar peticiones
 app.listen(3000, () => {
